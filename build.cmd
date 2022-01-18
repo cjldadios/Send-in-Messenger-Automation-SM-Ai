@@ -1,0 +1,1 @@
+pyinstaller --onefile --icon=./components/smai.ico main.py --distpath .  --name smai --add-binary "./chromedriver_win32/chromedriver.exe;./chromedriver_win32"

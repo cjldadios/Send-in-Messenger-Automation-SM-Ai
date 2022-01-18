@@ -1,0 +1,20 @@
+First Mode: Getting the list of friends	
+1. Go to your Facebook profile then click Friends.
+2. Copy the friends link, e.g. https://www.facebook.com/melbamaggay/friends.
+3. Open in Notepad and modify resources/settings.config.
+4. Replace the URL by pasting the link in settings.config.
+5. Save and close.
+5. Run smai.exe.
+6. Friends list will be saved in resources/friends2022.txt
+
+Second Mode:
+1. Open the Facebook post you want to share.
+2. Copy the post link, e.g. https://www.facebook.com/photo?fbid=297868279024025&set=a.174207784723409.
+3. Open in Notepad and modify resources/settings.config.
+4. Replace the URL by pasting the link in settings.config.
+5. Save and close.
+6. Replace the content of friends resources/recipients.txt by copy-pasting the contents of friends2022.txt.
+7. Run smai.exe.
+8. Log in within 2 minutes.
+9. Click Share and Send in Messenger.
+10. Click any Send button to begin.
