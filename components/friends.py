@@ -1,4 +1,5 @@
-from components.webdriver import get_driver, close_driver
+from itertools import count
+from components.webdriver import close_driver
 from components.utilities import delay
 from components.utilities import new_logger
 from components.file import config
@@ -8,6 +9,8 @@ from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import WebDriverException
 
 import datetime;
+import traceback
+
 
 logger = new_logger(__name__)
 
@@ -17,12 +20,25 @@ def login(browser):
     login_success = False
     login_timeout = int(config['DEFAULT']['login_timeout'])
 
+    # Must not throw an exception because the exe build will freeze (?).
+    # I think it's delay() that's causing the freeze.
+
     print("Waiting to login for {} sec, ".format(login_timeout), end="")
-    for countdown in reversed(range(login_timeout)):
+    # for countdown in reversed(range(login_timeout)):
+    while True:
+        countdown = -1
+
+        print("1")
         try:    
+            print("2")
             proceed_reference_element_xpath = "//span[text()='Friends']"
-            ref_element = browser.find_element_by_xpath(proceed_reference_element_xpath)
+            ref_element = None
+            if browser == None:
+                logger.warning("browser is None")
+                # ref_element = browser.find_element_by_xpath(proceed_reference_element_xpath)
+            print("3")
             if(ref_element != None):
+                print("4")
                 login_success = True
                 break
         except NoSuchElementException:
@@ -35,14 +51,23 @@ def login(browser):
             logger.warning("Browser window ureachable...")
             break
         except:
-            logger.exception("Something went wrong during login...")
+            #logger.exception("Something went wrong during login...")
+            logger.warning("Something went wrong during login...")
+            traceback.print_exc()
             break
-
+        finally:
+            # logger.exception("Something went wrong with the driver...")
+            pass
+            # logger.warning("Something went wrong with the driver...")
+            
         if countdown == 0:
             logger.info("Login timeout...")
             print()
+        print("5")
+        print("-")
+        # delay(1)
     # End - for countdown in reversed(range(login_timeout))
-
+    print("6")
     return login_success
 
 def get_friends_from_webpage(browser):
@@ -89,7 +114,7 @@ def get_friends_from_webpage(browser):
 def get_friends(browser):
 
     url = config['DEFAULT']['link']
-    browser.get(url)
+    # browser.get(url)
 
     login_success = login(browser)
    

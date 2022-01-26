@@ -5,8 +5,8 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\Users\\daves\\Documents\\Codes\\Send in Messenger Automation (SM-Ai)'],
-             binaries=[('./chromedriver_win32/chromedriver.exe', './chromedriver_win32')],
+             pathex=['C:\\Users\\daves\\Documents\\Codes\\SM-Ai - Script'],
+             binaries=[],
              datas=[],
              hiddenimports=[],
              hookspath=[],
