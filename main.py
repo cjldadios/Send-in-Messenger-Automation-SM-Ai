@@ -148,7 +148,7 @@ try:
                     login_success = True
                     break
             except NoSuchElementException:
-                print("{}".format(countdown), end="\r\n", flush=True)
+                print("{}".format(countdown), end="\r", flush=True)
                 time.sleep(1)
             except NoSuchWindowException:
                 logger.warning("Browser window closed unexpectedly...")
@@ -273,7 +273,7 @@ try:
                     break
                 else:
                     # print("else...")
-                    print("{}".format(countdown), end="\r\n", flush=True)
+                    print("{}".format(countdown), end="\r", flush=True)
             except NoSuchElementException:
                 print("{}...".format(countdown), end="", flush=True)
                 # traceback.print_exc()
@@ -381,7 +381,7 @@ try:
                         begin_send = True
                         break
                 except NoSuchElementException:
-                    print("{}".format(countdown), end="\r\n", flush=True)
+                    print("{}".format(countdown), end="\r", flush=True)
                     time.sleep(1)
                 except NoSuchWindowException:
                     logger.warning("Browser window closed unexpectedly...")
@@ -446,7 +446,7 @@ try:
                                             
                                 count = index + 1
                                 logger.info("[{}/{}] {}                        "
-                                    .format(count, name_count, name), end="\r\n")
+                                    .format(count, name_count, name), end="\r")
                                 # print("[{}/{}] {}".format(count, name_count, name))
                                 break
                             else:
