@@ -403,12 +403,12 @@ try:
                     while not input_selection_success:
                         
                         name_loading_end = time.time()
-                        print("Name loading wait--------------- ")
-                        print(name_loading_end)
-                        print(name_loading_start)
-                        difference = name_loading_end - name_loading_start
-                        print(difference)
-                        print(waiting_time_per_name)
+                        # print("Name loading wait--------------- ")
+                        # print(name_loading_end)
+                        # print(name_loading_start)
+                        # difference = name_loading_end - name_loading_start
+                        # print(difference)
+                        # print(waiting_time_per_name)
 
                         if name_loading_end - name_loading_start > waiting_time_per_name:
                             logger.warning("Name loading wait timeout for {}...".format(name))
@@ -618,6 +618,12 @@ finally:
 
 # delay(5)
 
+if browser != None:
+    try:
+        browser.close()
+        logger.info("Browser closed...")
+    except:
+        logger.warning("chromedriver.exe is already closed.")
 
 logger.info("Program terminated...")
-input("Press Enter or close the window to exit...")
+input("Close the window to exit...")
