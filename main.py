@@ -7,8 +7,16 @@ import datetime
 import traceback
 import re # RegEx
 import logging
-logging.basicConfig(filename='./smai.log', encoding='utf-8', level=logging.DEBUG,
-    format='%(asctime)s - %(name)s (line: %(lineno)d) - %(levelname)s: %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p')
+try:
+    if not os.path.exists('log'):
+        os.makedirs('log')
+    logging.basicConfig(filename='./log/smai.log', encoding='utf-8', level=logging.DEBUG,
+        format='%(asctime)s - %(name)s (line: %(lineno)d) - %(levelname)s: %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p')
+except:
+    traceback.print_exc()
+finally:
+    if not os.path.exists('resources'):
+        os.makedirs('resources')
 
 from configparser import ConfigParser
 from selenium import webdriver
@@ -16,13 +24,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import WebDriverException
-
-# from components.webdriver import get_driver
-# from components.utilities import new_logger
-# from components.file import evaluate_url
-# from components.friends import get_friends
-# from components.posts import send_in_messenger
-# from components.utilities import delay
 
 
 ''' CONSTANTS '''
@@ -42,7 +43,7 @@ config.read(configuration_file_directory)
 def delay(sec):
     if not math.isnan(sec):
         # print("Delay for {} sec, ".format(sec), end="")
-        print("Delay for {} sec, ".format(sec))
+        print("Delay for {} sec... ".format(sec))
         # for countdown in reversed(range(sec)):
             # print("{}...".format(countdown), end="", flush=True)
             # time.sleep(1)
@@ -53,7 +54,7 @@ def delay(sec):
 
         while end - start < sec:
             # print(end - start)
-            print(".", end="", flush=True)
+            # print(".", end="", flush=True)
             end = time.time()
 
         # print("hello")
@@ -62,28 +63,12 @@ def delay(sec):
     else:
         raise Exception("Parameter sec is not a Number.");
 
-def highlight(driver, element):
-    effect_time = 5
-    color = "yellow"
-    border = 5
-
-    """Highlights (blinks) a Selenium Webdriver element"""
-    driver = element._parent
-    def apply_style(s):
-        driver.execute_script("arguments[0].setAttribute('style', arguments[1]);",
-                                element, s)
-    
-    original_style = element.get_attribute('style')
-    apply_style("border: {0}px solid {1};".format(border, color))
-    time.sleep(effect_time)
-    apply_style(original_style)
-
 
 ''' START '''
 
 logger.info("==============================================================================")
 logger.info("Send in Messenger Automation (SM-Ai)")
-logger.info("Running...")
+logger.info("Program running...")
 
 # Evaluate URL
 url = config['DEFAULT']['link']
@@ -103,13 +88,13 @@ else:
 # print("Match: " + str(get_friends_match))
 # print("url: " + url)
 
-# browser = None
+browser = None
 
 options = webdriver.ChromeOptions()
 # Disable notifications when Facebook asks to show notifications
 options.add_argument("--disable-notifications")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
-driver_path = CURRENT_PATH + "/chromedriver_win32/chromedriver.exe"
+driver_path = CURRENT_PATH + "/" + config['DEFAULT']['driver'] # "/chromedriver_win32/chromedriver.exe"
 try:
     logger.info("Instanciating driver...")
     logger.info("from " + driver_path)
@@ -128,12 +113,12 @@ try:
         # Wait until successfully logged in
         logger.info("Waiting to login...")
         login_success = False
-        login_timeout = int(config['DEFAULT']['login_timeout'])
+        login_timeout = int(config['DEFAULT']['inactivity_timeout'])
 
         # Must not throw an exception because the exe build will freeze (?).
         # I think it's delay() that's causing the freeze.
 
-        print("Waiting to login for {} sec: ".format(login_timeout), end="")
+        print("Waiting to login for {} sec: ".format(login_timeout), end="\n")
         for countdown in reversed(range(login_timeout)):
         # while True:
             # countdown = -1
@@ -148,13 +133,13 @@ try:
                     login_success = True
                     break
             except NoSuchElementException:
-                print("{}".format(countdown), end="\r", flush=True)
+                print("{}                ".format(countdown), end="\r", flush=True)
                 time.sleep(1)
             except NoSuchWindowException:
                 logger.warning("Browser window closed unexpectedly...")
                 break
             except WebDriverException:
-                logger.warning("Browser window ureachable...")
+                logger.warning("Browser window unreachable...")
                 break
             except:
                 #logger.exception("Something went wrong during login...")
@@ -203,7 +188,7 @@ try:
                     logger.warning("Browser window closed unexpectedly...")
                     break
                 except WebDriverException:
-                    logger.warning("Browser window ureachable...")
+                    logger.warning("Browser window unreachable...")
                     break
                 except:
                     logger.exception("Something went wrong during login...")
@@ -253,9 +238,9 @@ try:
         # Wait until successfully logged in
         logger.info("Waiting to login...")
         login_success = False
-        login_timeout = int(config['DEFAULT']['login_timeout'])
+        login_timeout = int(config['DEFAULT']['inactivity_timeout'])
 
-        print("Waiting to login for {} sec: ".format(login_timeout), end="")
+        print("Waiting to login for {} sec: ".format(login_timeout), end="\n")
         for countdown in reversed(range(login_timeout)):
             try:
                 # print("try...")
@@ -273,9 +258,9 @@ try:
                     break
                 else:
                     # print("else...")
-                    print("{}".format(countdown), end="\r", flush=True)
+                    print("{}          ".format(countdown), end="\r", flush=True)
             except NoSuchElementException:
-                print("{}...".format(countdown), end="", flush=True)
+                print("{}                ".format(countdown), end="\r", flush=True)
                 # traceback.print_exc()
                 time.sleep(1)
             except NoSuchWindowException:
@@ -283,7 +268,7 @@ try:
                 # traceback.print_exc()
                 break
             except WebDriverException:
-                logger.warning("Browser window ureachable...")
+                logger.warning("Browser window unreachable...")
                 # traceback.print_exc()
                 break
             except:
@@ -316,7 +301,7 @@ try:
                 else:
                     logger.info("Loading " + recepients_file_directory + "...")
                     # Reading the file line-by-line
-                    with open(recepients_file_directory) as file:
+                    with open(recepients_file_directory, encoding='utf8') as file: 
                         while (line := file.readline().rstrip()): # NOTE: removing trailing whitespaces
                             # print(line)
                             recepient_names.append(line)
@@ -328,8 +313,7 @@ try:
             names_as_strings = recepient_names
 
             logger.info("\nRemoving blacklisted names...")
-            # blacklist_as_strings = get_blacklisted_names()
-            logger.info("Loading recepients...")
+            logger.info("Loading skiplist...")
 
             blacklist_file_directory = config['DEFAULT']['blacklist']
 
@@ -343,7 +327,7 @@ try:
                 else:
                     logger.info("Loading " + blacklist_file_directory + "...")
                     # Reading the file line-by-line
-                    with open(blacklist_file_directory) as file:
+                    with open(blacklist_file_directory, encoding='utf8') as file:
                         while (line := file.readline().rstrip()): # NOTE: removing trailing whitespaces
                             # print(line)
                             blacklisted_names.append(line)
@@ -370,8 +354,9 @@ try:
             # print(confirm)
 
             begin_send = False
-            inactivity_timeout = 300 # 5 minutes
-            print("Waiting to click Send for {} sec: ".format(inactivity_timeout), end="")
+            # inactivity_timeout = 300 # 5 minutes
+            inactivity_timeout = int(config['DEFAULT']['inactivity_timeout'])
+            print("Waiting to click Send for {} sec: ".format(inactivity_timeout), end="\n")
             for countdown in reversed(range(inactivity_timeout)):
                 try:
                     begin_send_reference_element_xpath = "//span[text()='Sent']"
@@ -381,13 +366,13 @@ try:
                         begin_send = True
                         break
                 except NoSuchElementException:
-                    print("{}".format(countdown), end="\r", flush=True)
+                    print("{}            ".format(countdown), end="\r", flush=True)
                     time.sleep(1)
                 except NoSuchWindowException:
                     logger.warning("Browser window closed unexpectedly...")
                     break
                 except WebDriverException:
-                    logger.warning("Browser window ureachable...")
+                    logger.warning("Browser window unreachable...")
                     break
                 except:
                     logger.exception("Something went wrong during login...")
@@ -404,13 +389,31 @@ try:
                 # automate_send(browser, approved_names)
 
                 logger.info("Initiating automation...")
-
                 name_count = len(approved_names)
 
+                waiting_time_per_name = int(config['DEFAULT']['waiting time per name'])
+                logger.info("waiting time per name: {}".format(str(waiting_time_per_name)))
+                
                 for index, name in enumerate(approved_names):
                     input_selection_success = False
 
+                    name_loading_start = time.time()
+                    name_loading_end = time.time()
+
                     while not input_selection_success:
+                        
+                        name_loading_end = time.time()
+                        print("Name loading wait--------------- ")
+                        print(name_loading_end)
+                        print(name_loading_start)
+                        difference = name_loading_end - name_loading_start
+                        print(difference)
+                        print(waiting_time_per_name)
+
+                        if name_loading_end - name_loading_start > waiting_time_per_name:
+                            logger.warning("Name loading wait timeout for {}...".format(name))
+                            break
+
                         try:
                             # Select input field.
                             name_search_field_xpath = "//input[@aria-label='Search for people and groups']"
@@ -420,7 +423,7 @@ try:
 
                                 # TODO: Just wait until input is selected for every element selection
                                 # like input selection, backspace press, and send button clicks?
-                                print("Do something here...")
+                                #print("Do something here...")
 
                 
                                 name_search_field_element.click()
@@ -429,36 +432,150 @@ try:
                                     name_search_field_element.send_keys(Keys.BACKSPACE)
                                 # Input name.
                                 name_search_field_element.send_keys(name)
+
+                                # if index == 0:
+                                #     logger.info("Letting names load...")
+                                #     delay(5)
+                                    
                                 # print("You have 10 sec to verify Send")
                                 # sleep(10)
                                 # Press send
-                                try:
-                                    logger.info("Attempting to click send for name: {}".format(name))
-                                    send_button = browser.find_element_by_xpath("//span[text()='Send']")
-                                    
-                                    ''' HIGHLIGHT or SEND? '''
-                                    # send_button.click() # Actual action
-                                    #highlight(browser, send_button) # Testing action
 
-                                except:
-                                    logger.exception("Something went wrong while clicking send...")
-                                    traceback.print_exc()
+                                ''' HIGHLIGHT or SEND? '''
+                                testing = True
+
+                                is_testing_as_string = config['DEFAULT']['testing']
+
+                                accepted_strings = ['Yes', 'yes', 'Y', 'y']
+                                if is_testing_as_string not in accepted_strings:
+                                    testing = False
+
+                                send_button_found = False
+                                successfully_sent = False
+
+                                # While send button is not found
+                                while not send_button_found:
+                                    try:
+                                        # logger.info("Attempting to click send for name: {}".format(name))
+                                        send_button = browser.find_element_by_xpath("//span[text()='Send']")
+
+                                        # Check if the send button exists.
+
+                                        if send_button != None:
+                                            send_button_found = True
+                                            
+                                            if not testing:
+                                                send_button.click() # Actual action
+                                            else:
+                                                # Testing action
+                                                effect_time = 5
+                                                color = "yellow"
+                                                border = 5
+
+                                                """Highlights (blinks) a Selenium Webdriver element"""
+                                                driver = send_button._parent
+                                                # driver = send_button
+                                                def apply_style(s):
+                                                    driver.execute_script("arguments[0].setAttribute('style', arguments[1]);",
+                                                                            send_button, s)
+                                                
+                                                original_style = send_button.get_attribute('style')
+                                                apply_style("border: {0}px solid {1};".format(border, color))
+                                                time.sleep(effect_time)
+                                                apply_style(original_style)
+
+                                            successfully_sent = True
+                                        else:
+                                            logger.warning("send_button is None")
+                                            
+                                    except NoSuchElementException:
+                                        # logger.warning("Send button not found...")
+                                        # logger.info("Retrying...")
+                                        # delay(1)
+                                        pass
+
+                                        # # Select input field.
+                                        # name_search_field_xpath = "//input[@aria-label='Search for people and groups']"
+                                        # name_search_field_element = browser.find_element_by_xpath(name_search_field_xpath)
+                                        # if(name_search_field_element != None):
+                                        #     input_selection_success = True
+
+                                        #     # TODO: Just wait until input is selected for every element selection
+                                        #     # like input selection, backspace press, and send button clicks?
+                                        #     #print("Do something here...")
+
+                            
+                                        #     name_search_field_element.click()
+                                        #     # Clear filed for new input, pressing backspace 100 times.
+                                        #     for i in range(100):
+                                        #         name_search_field_element.send_keys(Keys.BACKSPACE)
+                                        #     # Input name.
+                                        #     name_search_field_element.send_keys(name)
+
+                                        #     if index == 0:
+                                        #         logger.info("Letting names load...")
+                                        #         delay(5)
+                                                
+                                        #     # print("You have 10 sec to verify Send")
+                                        #     # sleep(10)
+                                        #     # Press send
+
+                                        #     ''' HIGHLIGHT or SEND? '''
+
+                                        #     logger.info("Attempting to click send for name: {}".format(name))
+                                        #     send_button = browser.find_element_by_xpath("//span[text()='Send']")
+                                            
+                                        #     try:
+                                        #         if not testing:
+                                        #             send_button.click() # Actual action
+                                        #         else:
+                                        #             # Testing action
+                                        #             effect_time = 5
+                                        #             color = "yellow"
+                                        #             border = 5
+
+                                        #             """Highlights (blinks) a Selenium Webdriver element"""
+                                        #             driver = send_button._parent
+                                        #             # driver = send_button
+                                        #             def apply_style(s):
+                                        #                 driver.execute_script("arguments[0].setAttribute('style', arguments[1]);",
+                                        #                                         send_button, s)
+                                                    
+                                        #             original_style = send_button.get_attribute('style')
+                                        #             apply_style("border: {0}px solid {1};".format(border, color))
+                                        #             time.sleep(effect_time)
+                                        #             apply_style(original_style)
+                                                
+                                        #         successfully_sent = True
+                                        #     except:
+                                        #         logger.info("Failed to click send for name: {}".format(name))
+
+                                        # # End if name search field element is not None
+
+                                    except:
+                                        logger.exception("Something went wrong while clicking send...")
+                                        traceback.print_exc()
+                                # End while send button not found.
                                             
                                 count = index + 1
-                                logger.info("[{}/{}] {}                        "
-                                    .format(count, name_count, name), end="\r")
+                                is_success = "sent" if successfully_sent else "failed"
+                                logger.info("[{}/{}] {} ({})".format(count, name_count, name, is_success))
                                 # print("[{}/{}] {}".format(count, name_count, name))
                                 break
                             else:
-                                print("Name input field not selected...", end="", flush=True)
+                                logger.warning("Name input field is none...")
+                                # print("Name input field is none...", end="", flush=True)
+                                delay(1)
                         except NoSuchElementException:
-                            print("No name search field found...", end="", flush=True)
-                            time.sleep(1)
+                            # print("No name search field found...", end="", flush=True)
+                            logger.warning("No name search field found...")
+                            # time.sleep(1)
+                            break
                         except NoSuchWindowException:
                             logger.warning("Browser window closed unexpectedly...")
                             break
                         except WebDriverException:
-                            logger.warning("Browser window ureachable...")
+                            logger.warning("Browser window unreachable...")
                             break
                         except:
                             logger.exception("Something went wrong while inputting names...")
@@ -502,5 +619,5 @@ finally:
 # delay(5)
 
 
-logger.info("Closing program...")
-input("Press Enter to continue...")
+logger.info("Program terminated...")
+input("Press Enter or close the window to exit...")
