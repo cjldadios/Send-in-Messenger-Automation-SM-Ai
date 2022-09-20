@@ -453,7 +453,7 @@ try:
 
                                 is_testing_as_string = config['DEFAULT']['testing']
 
-                                accepted_strings = ['Yes', 'yes', 'Y', 'y']
+                                accepted_strings = ['Yes', 'yes', 'Y', 'y', 'YES']
                                 if is_testing_as_string not in accepted_strings:
                                     testing = False
 
@@ -625,7 +625,9 @@ finally:
         logger.info("Check your browser version, update driver location in settings.txt, tested only for Chrome.")
         logger.info("Get the updated Selenium Driver here:")
         logger.info("https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/")
-
+    
+    running_as_trial =  config['DEFAULT']['testing']
+    logger.info("Trial run: " + running_as_trial)
 
 # driver.get(url)
 # TODO: Wait until successful login.
