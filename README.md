@@ -1,2 +1,2 @@
 Download here:
-https://www.mediafire.com/file/3bm57kcudcdbrtr/SM-Ai_Release_2022-01-31.zip/file
+https://www.mediafire.com/file/ushbu0xclb05imx/SM-Ai_2022-09-20_Release.zip/file
