@@ -1,1 +1,1 @@
-pyinstaller --onefile --icon=./components/smai.ico main.py --distpath .  --name smai 
+pyinstaller --onefile --icon=./resources/smai.ico main.py --distpath .  --name smai 

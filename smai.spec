@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\Users\\daves\\Documents\\Codes\\SM-Ai - Script'],
+             pathex=['C:\\Users\\daves\\Documents\\GitHub\\Send-in-Messenger-Automation-SM-Ai'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -31,4 +31,4 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True , icon='components\\smai.ico')
+          console=True , icon='resources\\smai.ico')

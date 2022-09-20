@@ -14,6 +14,7 @@ try:
         format='%(asctime)s - %(name)s (line: %(lineno)d) - %(levelname)s: %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p')
 except:
     traceback.print_exc()
+    
 finally:
     if not os.path.exists('resources'):
         os.makedirs('resources')
@@ -24,11 +25,12 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import SessionNotCreatedException
 
 
 ''' CONSTANTS '''
 CURRENT_PATH = os.path.abspath(".")
-configuration_file_directory = CURRENT_PATH + "/resources/" + "settings.config"
+configuration_file_directory = CURRENT_PATH + "/resources/" + "settings.txt"
 
 
 ''' VARIABLES '''
@@ -95,6 +97,7 @@ options = webdriver.ChromeOptions()
 options.add_argument("--disable-notifications")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 driver_path = CURRENT_PATH + "/" + config['DEFAULT']['driver'] # "/chromedriver_win32/chromedriver.exe"
+driver_relative_path_name = config['DEFAULT']['driver']
 try:
     logger.info("Instanciating driver...")
     logger.info("from " + driver_path)
@@ -196,7 +199,10 @@ try:
             # End - while not reached bottom of friends list
 
             # //a[text()='Friends']/parent::span/parent::h2/parent::div/parent::div/parent::div/parent::div/parent::div/div[3]//span[@class="d2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh a8c37x1j fe6kdd0r mau55g9w c8b282yb keod5gw0 nxhoafnm aigsh9s9 d3f4x2em mdeji52x a5q79mjw g1cxx5fr lrazzd5p oo9gr5id"]
-            names_as_elements = browser.find_elements_by_xpath("//a[text()='Friends']/parent::span/parent::h2/parent::div/parent::div/parent::div/parent::div/parent::div/div[3]//span[@class='d2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh a8c37x1j fe6kdd0r mau55g9w c8b282yb keod5gw0 nxhoafnm aigsh9s9 d3f4x2em mdeji52x a5q79mjw g1cxx5fr lrazzd5p oo9gr5id']")
+            #names_as_elements = browser.find_elements_by_xpath("//a[text()='Friends']/parent::span/parent::h2/parent::div/parent::div/parent::div/parent::div/parent::div/div[3]//span[@class='d2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh a8c37x1j fe6kdd0r mau55g9w c8b282yb keod5gw0 nxhoafnm aigsh9s9 d3f4x2em mdeji52x a5q79mjw g1cxx5fr lrazzd5p oo9gr5id']")
+            
+            names_as_elements = browser.find_elements_by_xpath("//a[text()='Friends']/parent::span/parent::h2/parent::div/parent::div/parent::div/parent::div/parent::div/div[3]//span[string-length(text()) > 0 and not(contains(.,'mutual friends'))]")
+            
             # List of string converted from list of elements
             names_as_strings = [element.text for element in names_as_elements]
 
@@ -222,7 +228,8 @@ try:
                     browser.close()
                     logger.info("Driver closed...")
                 except:
-                    logger.warning("chromedriver.exe is already closed.")
+                    #logger.warning("chromedriver.exe is already closed.")
+                    logger.warning(driver_relative_path_name + " is already closed.")
             
     else:
         # SEND IN MESSENGER AUTOMATION
@@ -593,18 +600,31 @@ try:
                     browser.close()
                     logger.info("Driver closed...")
                 except:
-                    logger.warning("chromedriver.exe is already closed.")
+                    #logger.warning("chromedriver.exe is already closed.")
+                    logger.warning(driver_relative_path_name + " is already closed.")
     # End else send in Messenger
 # End try if driver is properly instanciated
+
+except SessionNotCreatedException:
+    #traceback.print_exc()
+    logger.error("Incompatible Driver Error.")
+
+except FileNotFoundError:
+    logger.warning(driver_relative_path_name + " is not found.")
+    
 except:
-    logger.error("chromedriver.exe is not in found.")
+    #logger.error("chromedriver.exe is not in found.")
+    #logger.warning(driver_path + " is not found.")
     # delay(10)
     traceback.print_exc()
-    logger.exception('Got exception on main handler')
-    raise
+    #logger.exception('Got exception on main handler')
+    #raise
+
 finally:
     if browser == None:
-        logger.error("Driver is None.")
+        logger.info("Check your browser version, update driver location in settings.txt, tested only for Chrome.")
+        logger.info("Get the updated Selenium Driver here:")
+        logger.info("https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/")
 
 
 # driver.get(url)
@@ -623,7 +643,9 @@ if browser != None:
         browser.close()
         logger.info("Browser closed...")
     except:
-        logger.warning("chromedriver.exe is already closed.")
+        #logger.warning("chromedriver.exe is already closed.")
+        logger.warning(driver_relative_path_name + " is already closed.")
 
 logger.info("Program terminated...")
 input("Close the window to exit...")
+
